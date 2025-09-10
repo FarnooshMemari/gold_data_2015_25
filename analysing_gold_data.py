@@ -26,7 +26,7 @@ thr = df["SLV_pct"].abs().quantile(0.90)
 
 # Filter: select days where SLV had large moves (top 10%)
 subset = df[df["SLV_pct"].abs() >= thr]
-print("GLD% on those big SLV movement days:\n", subset["GLD_pct"].describe())
+print("GLD% on those big SLV movement days:", subset["GLD_pct"].describe())
 
 # 4) Prepare data for linear regression: remove rows with NaN % changes
 ret = df.dropna(subset=["GLD_pct", "SLV_pct"])
