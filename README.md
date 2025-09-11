@@ -71,6 +71,7 @@ Derived columns created in the script:
 - `GLD_pct` = daily % change of GLD  
 - `SLV_pct` = daily % change of SLV
 
+
 ---
 
 ## Results (fill with your run)
@@ -88,6 +89,9 @@ After running the script, copy the printed values here:
 **Interpretation (example wording):**  
 > GLD and SLV exhibit a **positive linear relationship** on a daily basis. The OLS slope is positive and the R² of ~`…` suggests a meaningful (though not perfect) co-movement. On days with **large silver moves** (top 10% by absolute change), gold’s distribution widens, indicating stronger co-movement during volatile periods. These results show **correlation**, not causation.
 
+**Visualization:** 
+
+![alt text](image.png)
 ---
 
 ## How to Run

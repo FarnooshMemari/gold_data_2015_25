@@ -65,3 +65,4 @@ plt.title("Linear relation: GLD% ~ SLV%")
 plt.legend()
 plt.tight_layout()
 plt.show()
+
