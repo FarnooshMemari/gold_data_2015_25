@@ -1,68 +1,38 @@
-# Import necessary libraries
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+# Main script that ties together loading, transforming,
+# modeling, and now plotting of the gold/silver dataset.
 
-# 1) Load the dataset
-df = pd.read_csv("gold_data_2015_25.csv")
+from gold_analysis.io import load_csv
+from gold_analysis.transform import add_returns, select_top_abs_slv
+from gold_analysis.model import fit_ols_gld_on_slv
+from gold_analysis.viz import scatter_with_fit  # <-- Import plotting helper
 
-# 2) Initial data inspection
-print(df.head())  # Preview the first few rows
-df.info()  # Get column types and non-null counts
-print(df.describe())  # Basic stats summary
-print("Missing values:\n", df.isnull().sum())  # Check for missing data
 
-# Convert the 'Date' column to datetime format and sort the data over time
-df["Date"] = pd.to_datetime(df["Date"])
-df = df.sort_values("Date").reset_index(drop=True)
+def main(csv_path="gold_data_2015_25.csv"):
+    # Step 1: load raw CSV data
+    df = load_csv(csv_path)
 
-# 3) Feature engineering: compute daily percentage changes for GLD and SLV
-df["GLD_pct"] = df["GLD"].pct_change()
-df["SLV_pct"] = df["SLV"].pct_change()
+    # Step 2: calculate daily percentage returns for GLD and SLV
+    df_r = add_returns(df)
 
-# Define threshold: 90th percentile of absolute SLV daily changes
-thr = df["SLV_pct"].abs().quantile(0.90)
+    # Step 3: identify "big move" days (top 10% SLV absolute moves)
+    big, thr = select_top_abs_slv(df_r, 0.9)
 
-# Filter: select days where SLV had large moves (top 10%)
-subset = df[df["SLV_pct"].abs() >= thr]
-print("GLD% on those big SLV movement days:", subset["GLD_pct"].describe())
+    # Step 4: fit OLS regression (GLD_pct ~ SLV_pct)
+    fit = fit_ols_gld_on_slv(df_r)
 
-# 4) Prepare data for linear regression: remove rows with NaN % changes
-ret = df.dropna(subset=["GLD_pct", "SLV_pct"])
-X = ret[["SLV_pct"]].values  # Independent variable: SLV daily % changes
-y = ret["GLD_pct"].values  # Dependent variable: GLD daily % changes
+    # Print analysis results to terminal
+    print(f"Top-10% |SLV| threshold: {thr:.4f}")
+    print(
+        f"Slope: {fit['slope']:.6f}, Intercept: {fit['intercept']:.6f},\n"
+        f"R²: {fit['r2']:.6f}"
+    )
+    print(f"Big-move rows: {len(big)} / {len(df_r)}")
 
-# Fit a linear regression model
-model = LinearRegression().fit(X, y)
+    # Step 5: Save scatter plot with regression line to an image file
+    out_path = scatter_with_fit(df_r, fit, path="image.png")
+    print(f"Saved plot to {out_path}")
 
-# Output model parameters
-print("\nPredicting GLD percent change using SLV percent change")
-print(
-    "slope:",
-    model.coef_[0],
-    " intercept:",
-    model.intercept_,
-    " R^2:",
-    model.score(X, y),
-)
 
-# 5) Plot: scatter of actual returns and fitted regression line
-xs = np.linspace(X.min(), X.max(), 200).reshape(
-    -1, 1
-)  # Linearly spaced values for plotting
-plt.scatter(X, y, alpha=0.5, label="daily returns")  # Scatter plot of data
-plt.plot(xs, model.predict(xs), linewidth=2, label="OLS fit")  # Fitted line
-
-# Add reference lines at 0 for visual aid
-plt.axhline(0, color="gray", linestyle="--")
-plt.axvline(0, color="gray", linestyle="--")
-
-# Labeling and final touches
-plt.xlabel("SLV daily % change")
-plt.ylabel("GLD daily % change")
-plt.title("Linear relation: GLD% ~ SLV%")
-plt.legend()
-plt.tight_layout()
-plt.show()
-
+if __name__ == "__main__":
+    # Run the analysis workflow if the script is called directly
+    main()

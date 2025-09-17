@@ -1,6 +1,6 @@
-pylint
-flake8
+pandas
+numpy
+scikit-learn
+matplotlib
 pytest
-click
-black
 pytest-cov

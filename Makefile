@@ -1,5 +1,5 @@
 install:
-	pip install --upgrade pip &&\
+	pip install --upgrade pip && \
 	pip install -r requirements.txt
 
 format:
@@ -11,4 +11,5 @@ lint:
 clean:
 	rm -rf __pycache__ .pytest_cache .coverage
 
+# 'all' runs everything in sequence
 all: install format lint clean
