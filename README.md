@@ -1,106 +1,100 @@
-# Gold vs Silver — Linear Relationship 
+# Gold vs Silver — Linear Relationship  
 
-## Overview
-This mini–data-engineering project analyzes how **gold (GLD)** and **silver (SLV)** move together. It follows the assignment workflow end-to-end:
+## Overview  
+This project analyzes how **gold (GLD)** and **silver (SLV)** move together on a daily basis.  
+It has been refactored into **modular code** with **unit/system tests** and a **Dev Container** for reproducibility.  
 
-- import the dataset
-- inspect and validate data quality
-- create meaningful subsets (filtering)
-- summarize with `groupby`
-- run a simple **linear regression** (GLD% ~ SLV%)
-- produce one plot
-- document decisions, limitations, and next steps
+The workflow includes:  
+- loading and validating the dataset  
+- computing daily returns  
+- identifying “big SLV move” days  
+- summarizing distributions  
+- fitting a simple **linear regression** (`GLD_pct ~ SLV_pct`)  
+- producing a scatter plot with regression line  
+- verifying correctness with automated tests  
 
 > **Dataset**: `gold_data_2015_25.csv` (Kaggle: *Gold Price 2015–2025*)  
-> **Goal**: Show a clear, interpretable **linear relation** between two variables in the dataset.  
-> **Choice**: **GLD (gold)** vs **SLV (silver)** — these precious metals typically co-move and yield a clean linear fit for a beginner project.
+> **Goal**: Show a clear, interpretable **linear relation** between GLD and SLV daily returns.  
 
 ---
 
-## What I did (Step by Step)
+## What I did (Step by Step)  
 
-1. **Import the dataset**
-   - Loaded `gold_data_2015_25.csv` using Pandas.
-   - Saved code in `analysing_gold_simple.py`.
+1. **Restructured into modules**  
+   - `gold_analysis/io.py` → data loading  
+   - `gold_analysis/transform.py` → returns & filtering  
+   - `gold_analysis/model.py` → linear regression  
+   - `gold_analysis/viz.py` → plotting helper  
 
-2. **Inspect the data**
-   - Used `df.head()`, `df.info()`, and `df.describe()` to understand shapes, dtypes, and summary statistics.
-   - Checked missing values with `df.isnull().sum()` (no critical NAs expected).
-   - Converted the `Date` column to `datetime` and sorted by date.
+2. **Main script**  
+   - `analysing_gold_data.py` orchestrates the pipeline: load → transform → model → visualize.  
+   - Prints threshold, slope, intercept, R², and saves a PNG (`image.png`).  
 
-3. **Create returns & apply a meaningful filter**
-   - Calculated daily percent changes (returns): `GLD_pct = GLD.pct_change()` and `SLV_pct = SLV.pct_change()`.
-   - Defined “**big SLV moves**” as the **top 10%** of absolute daily SLV returns (90th percentile).
-   - Filtered those days and described gold’s reaction on the same days (`subset["GLD_pct"].describe()`).
+3. **Tests**  
+   - `tests/test_io.py` → load_csv behavior  
+   - `tests/test_transform.py` → returns & filtering edge cases  
+   - `tests/test_model.py` → regression fit checks  
+   - `tests/test_viz.py` → ensures plot is saved  
+   - `tests/test_system_e2e.py` → full pipeline test  
 
-4. **Summarize with `groupby` (optional extension)**
-   - For monthly summaries you can add:
-     ```python
-     df["YYYY_MM"] = df["Date"].dt.to_period("M").astype(str)
-     monthly = df.groupby("YYYY_MM")[["GLD","SLV"]].agg(["mean","count"])
-     ```
-   - This provides monthly average levels and observation counts.
+4. **Dev Container**  
+   - `.devcontainer/devcontainer.json` ensures reproducible setup in VS Code Codespaces / Dev Containers.  
+   - Comes pre-installed with dependencies (`requirements.txt`).  
 
-5. **Explore a machine-learning algorithm (Linear Regression)**
-   - Fitted **ordinary least squares** on daily returns:
-     - **Model**: `GLD_pct ~ SLV_pct`
-     - Reported **slope**, **intercept**, and **R²**.
-   - Using returns (instead of levels) avoids spurious regression on trending price series.
-
-6. **Visualization**
-   - Produced a single **scatter plot** (SLV% on x-axis, GLD% on y-axis) and added the **fitted OLS line**.
-   - This visually confirms the positive linear relation.
-
-7. **Documentation (this README)**
-   - Explained goals, steps, decisions, and how to reproduce.
+5. **Documentation (this README)**  
+   - Clear explanation of steps, results, and how to reproduce.  
 
 ---
 
-## Data Dictionary (from the CSV)
+## Data Dictionary  
 
-| Column   | Description                                 | Type      |
-|----------|---------------------------------------------|-----------|
-| Date     | Trading date                                | date      |
-| SPX      | S&P 500 index level                         | float     |
-| GLD      | Gold price (ETF proxy)                      | float     |
-| USO      | Oil price (ETF proxy)                       | float     |
-| SLV      | Silver price (ETF proxy)                    | float     |
-| EUR/USD  | Euro to U.S. Dollar exchange rate           | float     |
+| Column   | Description                               | Type   |  
+|----------|-------------------------------------------|--------|  
+| Date     | Trading date                              | date   |  
+| SPX      | S&P 500 index level                       | float  |  
+| GLD      | Gold price (ETF proxy)                    | float  |  
+| USO      | Oil price (ETF proxy)                     | float  |  
+| SLV      | Silver price (ETF proxy)                  | float  |  
+| EUR/USD  | Euro to U.S. Dollar exchange rate         | float  |  
 
-Derived columns created in the script:
+Derived columns:  
 - `GLD_pct` = daily % change of GLD  
-- `SLV_pct` = daily % change of SLV
-
+- `SLV_pct` = daily % change of SLV  
 
 ---
 
-## Results (fill with your run)
-After running the script, copy the printed values here:
+## Results (example run)  
 
-- **Missing values (per column)**: `Nothing`
-- **Threshold for “big SLV moves”** (|SLV%| ≥): `2.4%`
-- **GLD% on big-SLV days** (`describe()`):
-  - mean: `0.04%`, median: `0.48%`, std: `1.77%`, min/max: `−5.37% / 4.85%`
-- **Linear Regression (returns)** `GLD_pct ~ SLV_pct`:
-  - slope: `0.4125557763407186` (expected **positive**)
-  - intercept: `0.0002271795180790635`
-  - **R²**: `0.5796355903962935` (closer to 1 ⇒ stronger linear fit)
+- **Threshold for big SLV moves (90th percentile)**: ~`0.0261` (2.6%)  
+- **Regression fit (`GLD_pct ~ SLV_pct`)**:  
+  - slope ≈ `0.4126`  
+  - intercept ≈ `0.0002`  
+  - R² ≈ `0.5796`  
 
-**Interpretation (example wording):**  
-> GLD and SLV exhibit a **positive linear relationship** on a daily basis. The OLS slope is positive and the R² of ~`…` suggests a meaningful (though not perfect) co-movement. On days with **large silver moves** (top 10% by absolute change), gold’s distribution widens, indicating stronger co-movement during volatile periods. These results show **correlation**, not causation.
+**Interpretation:**  
+> Gold and silver show a **positive linear relationship** in daily returns.  
+> R² around 0.58 suggests meaningful co-movement, though not perfect.  
+> On days of large silver moves, gold’s response varies more, consistent with stronger correlation during volatility.  
 
-**Visualization:** 
+**Visualization:**  
+![OLS scatter plot](image.png)  
 
-![alt text](image.png)
 ---
 
-## How to Run
+## How to Run  
 
-### Local (Python 3.10+ recommended)
+### Local (Python 3.10+ recommended)  
+
 ```bash
-# optional: use a virtual environment
+# optional: create a virtual environment
 # python -m venv .venv
 # source .venv/bin/activate   # Windows: .venv\Scripts\activate
 
+# install dependencies
 pip install -r requirements.txt
-python analysing_gold_simple.py
+
+# run tests
+pytest -q
+
+# run the analysis script
+python analysing_gold_data.py
