@@ -101,3 +101,9 @@ pytest -q
 
 # run the analysis script
 python analysing_gold_data.py
+```
+
+### Dev Container
+
+- Open in VS Code (Command Palette → “Dev Containers: Reopen in Container”).
+- Dependencies are pre-installed; run the same commands as above inside the container.
