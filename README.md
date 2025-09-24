@@ -93,3 +93,11 @@ pip install -r requirements.txt
 
 # Run main pipeline
 python analysing_gold_data.py
+
+```
+
+### Run Tests
+
+```bash
+pytest
+```
