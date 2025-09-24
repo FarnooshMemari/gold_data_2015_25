@@ -1,3 +1,5 @@
+[![CodeQL](https://github.com/FarnooshMemari/gold_data_2015_25/actions/workflows/codeql.yml/badge.svg)](https://github.com/FarnooshMemari/gold_data_2015_25/actions/workflows/codeql.yml)
+
 # Gold vs Silver — Linear Relationship  
 
 ## Overview  
