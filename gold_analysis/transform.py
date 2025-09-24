@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 def add_returns(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute daily percentage returns for GLD and SLV.
@@ -14,7 +15,10 @@ def add_returns(df: pd.DataFrame) -> pd.DataFrame:
     # Drop first row with NaNs created by pct_change
     return out.dropna(subset=["GLD_pct", "SLV_pct"]).reset_index(drop=True)
 
-def select_top_abs_slv(df: pd.DataFrame, quantile: float = 0.9) -> tuple[pd.DataFrame, float]:
+
+def select_top_abs_slv(
+    df: pd.DataFrame, quantile: float = 0.9
+) -> tuple[pd.DataFrame, float]:
     """
     Filter rows where the absolute SLV return is in the top quantile.
     - quantile = 0.9 → keep the biggest 10% absolute SLV moves.

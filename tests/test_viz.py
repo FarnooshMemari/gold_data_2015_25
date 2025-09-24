@@ -5,13 +5,16 @@
 import pandas as pd
 from gold_analysis.viz import scatter_with_fit
 
+
 def test_scatter_with_fit_saves_png(tmp_path):
     # Minimal synthetic data for plotting
-    df = pd.DataFrame({
-        "SLV_pct": [-0.02, -0.01, 0.0, 0.01, 0.02],
-        "GLD_pct": [-0.01, -0.005, 0.0, 0.006, 0.015],
-    })
-    
+    df = pd.DataFrame(
+        {
+            "SLV_pct": [-0.02, -0.01, 0.0, 0.01, 0.02],
+            "GLD_pct": [-0.01, -0.005, 0.0, 0.006, 0.015],
+        }
+    )
+
     # Minimal fit info (a simple slope/intercept pair)
     fit_info = {"slope": 0.7, "intercept": 0.0, "r2": 0.5, "model": None}
 

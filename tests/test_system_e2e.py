@@ -5,6 +5,7 @@ from gold_analysis.io import load_csv
 from gold_analysis.transform import add_returns, select_top_abs_slv
 from gold_analysis.model import fit_ols_gld_on_slv
 
+
 def test_e2e_repo_csv():
     # Load the actual project CSV
     df = load_csv("gold_data_2015_25.csv")

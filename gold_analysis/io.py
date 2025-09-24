@@ -4,6 +4,7 @@ import pandas as pd
 # Expected columns in the raw CSV
 REQUIRED_COLS = {"Date", "GLD", "SLV"}
 
+
 def load_csv(path: str | Path) -> pd.DataFrame:
     """
     Load the gold/silver dataset from a CSV file.

@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
+
 def fit_ols_gld_on_slv(df: pd.DataFrame):
     """
     Fit an OLS regression: GLD_pct ~ SLV_pct

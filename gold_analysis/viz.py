@@ -1,11 +1,13 @@
 # Visualization helper functions for the gold/silver analysis project
 
 import matplotlib
+
 # Use a non-interactive backend so plots can be saved in headless environments
 # (like VS Code Dev Containers or Docker). This avoids GUI errors with plt.show().
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
+
 
 def scatter_with_fit(df, fit_info, path="scatter_fit.png"):
     """
@@ -29,7 +31,7 @@ def scatter_with_fit(df, fit_info, path="scatter_fit.png"):
     # Plot regression line using slope (m) and intercept (b)
     m, b = fit_info["slope"], fit_info["intercept"]
     xs = df["SLV_pct"].to_numpy()
-    ax.plot(xs, m*xs + b, color="red", label="OLS fit")
+    ax.plot(xs, m * xs + b, color="red", label="OLS fit")
 
     # Label axes and add title
     ax.set_xlabel("SLV_pct")
