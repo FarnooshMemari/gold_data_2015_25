@@ -88,21 +88,6 @@ Derived columns:
 
 ### Local (Python 3.10+ recommended)  
 
-```bash
-# optional: create a virtual environment
-# python -m venv .venv
-# source .venv/bin/activate   # Windows: .venv\Scripts\activate
-
-# install dependencies
-pip install -r requirements.txt
-
-# run tests
-pytest -q
-
-# run the analysis script
-python analysing_gold_data.py
-```
-
 ### Dev Container
 
 - Open in VS Code (Command Palette → “Dev Containers: Reopen in Container”).
