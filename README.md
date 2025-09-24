@@ -1,27 +1,26 @@
 ![CI](https://github.com/FarnooshMemari/gold_data_2015_25/actions/workflows/main.yml/badge.svg?branch=main)
 
-
-# Gold vs Silver — Linear Relationship  
+# Gold vs. Silver — Linear Relationship  
 
 ## Overview  
 This project analyzes how **gold (GLD)** and **silver (SLV)** move together on a daily basis.  
 It has been refactored into **modular code** with **unit/system tests** and a **Dev Container** for reproducibility.  
 
 The workflow includes:  
-- loading and validating the dataset  
-- computing daily returns  
-- identifying “big SLV move” days  
-- summarizing distributions  
-- fitting a simple **linear regression** (`GLD_pct ~ SLV_pct`)  
-- producing a scatter plot with regression line  
-- verifying correctness with automated tests  
+- Loading and validating the dataset  
+- Computing daily returns  
+- Identifying “big SLV move” days  
+- Summarizing distributions  
+- Fitting a simple **linear regression** (`GLD_pct ~ SLV_pct`)  
+- Producing a scatter plot with regression line  
+- Verifying correctness with automated tests  
 
 > **Dataset**: `gold_data_2015_25.csv` (Kaggle: *Gold Price 2015–2025*)  
-> **Goal**: Show a clear, interpretable **linear relation** between GLD and SLV daily returns.  
+> **Goal**: Demonstrate a clear, interpretable **linear relationship** between GLD and SLV daily returns.  
 
 ---
 
-## What I did (Step by Step)  
+## Step-by-Step Implementation  
 
 1. **Restructured into modules**  
    - `gold_analysis/io.py` → data loading  
@@ -31,52 +30,52 @@ The workflow includes:
 
 2. **Main script**  
    - `analysing_gold_data.py` orchestrates the pipeline: load → transform → model → visualize.  
-   - Prints threshold, slope, intercept, R², and saves a PNG (`image.png`).  
+   - Prints threshold, slope, intercept, R², and saves a plot (`image.png`).  
 
 3. **Tests**  
-   - `tests/test_io.py` → load_csv behavior  
-   - `tests/test_transform.py` → returns & filtering edge cases  
+   - `tests/test_io.py` → verifies `load_csv` behavior  
+   - `tests/test_transform.py` → checks return calculations & filtering edge cases  
    - `tests/test_model.py` → regression fit checks  
-   - `tests/test_viz.py` → ensures plot is saved  
-   - `tests/test_system_e2e.py` → full pipeline test  
+   - `tests/test_viz.py` → ensures the plot is generated and saved  
+   - `tests/test_system_e2e.py` → full pipeline integration test  
 
 4. **Dev Container**  
    - `.devcontainer/devcontainer.json` ensures reproducible setup in VS Code Codespaces / Dev Containers.  
    - Comes pre-installed with dependencies (`requirements.txt`).  
 
 5. **Documentation (this README)**  
-   - Clear explanation of steps, results, and how to reproduce.  
+   - Clear explanation of workflow, results, and reproducibility steps.  
 
 ---
 
 ## Data Dictionary  
 
-| Column   | Description                               | Type   |  
-|----------|-------------------------------------------|--------|  
-| Date     | Trading date                              | date   |  
-| SPX      | S&P 500 index level                       | float  |  
-| GLD      | Gold price (ETF proxy)                    | float  |  
-| USO      | Oil price (ETF proxy)                     | float  |  
-| SLV      | Silver price (ETF proxy)                  | float  |  
-| EUR/USD  | Euro to U.S. Dollar exchange rate         | float  |  
+| Column   | Description                        | Type   |  
+|----------|------------------------------------|--------|  
+| Date     | Trading date                       | date   |  
+| SPX      | S&P 500 index level                | float  |  
+| GLD      | Gold price (ETF proxy)             | float  |  
+| USO      | Oil price (ETF proxy)              | float  |  
+| SLV      | Silver price (ETF proxy)           | float  |  
+| EUR/USD  | Euro to U.S. Dollar exchange rate  | float  |  
 
-Derived columns:  
-- `GLD_pct` = daily % change of GLD  
-- `SLV_pct` = daily % change of SLV  
+**Derived columns**:  
+- `GLD_pct` = daily % change in GLD  
+- `SLV_pct` = daily % change in SLV  
 
 ---
 
-## Results (example run)  
+## Results (Example Run)  
 
-- **Threshold for big SLV moves (90th percentile)**: ~`0.0261` (2.6%)  
-- **Regression fit (`GLD_pct ~ SLV_pct`)**:  
-  - slope ≈ `0.4126`  
-  - intercept ≈ `0.0002`  
+- **Threshold for big SLV moves (90th percentile):** ≈ `0.0261` (2.6%)  
+- **Regression fit (`GLD_pct ~ SLV_pct`):**  
+  - Slope ≈ `0.4126`  
+  - Intercept ≈ `0.0002`  
   - R² ≈ `0.5796`  
 
 **Interpretation:**  
-> Gold and silver show a **positive linear relationship** in daily returns.  
-> R² around 0.58 suggests meaningful co-movement, though not perfect.  
+> Gold and silver exhibit a **positive linear relationship** in daily returns.  
+> An R² of ~0.58 indicates meaningful co-movement, though not perfect.  
 > On days of large silver moves, gold’s response varies more, consistent with stronger correlation during volatility.  
 
 **Visualization:**  
@@ -86,9 +85,11 @@ Derived columns:
 
 ## How to Run  
 
-### Local (Python 3.10+ recommended)  
+### Local (Python 3.10+)  
 
-### Dev Container
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-- Open in VS Code (Command Palette → “Dev Containers: Reopen in Container”).
-- Dependencies are pre-installed; run the same commands as above inside the container.
+# Run main pipeline
+python analysing_gold_data.py
