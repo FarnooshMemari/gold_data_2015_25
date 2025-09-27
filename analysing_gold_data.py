@@ -1,38 +1,68 @@
-# Main script that ties together loading, transforming,
-# modeling, and now plotting of the gold/silver dataset.
-
-from gold_analysis.io import load_csv
-from gold_analysis.transform import add_returns, select_top_abs_slv
-from gold_analysis.model import fit_ols_gld_on_slv
-from gold_analysis.viz import scatter_with_fit  # <-- Import plotting helper
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 
-def main(csv_path="gold_data_2015_25.csv"):
-    # Step 1: load raw CSV data
-    df = load_csv(csv_path)
-
-    # Step 2: calculate daily percentage returns for GLD and SLV
-    df_r = add_returns(df)
-
-    # Step 3: identify "big move" days (top 10% SLV absolute moves)
-    big, thr = select_top_abs_slv(df_r, 0.9)
-
-    # Step 4: fit OLS regression (GLD_pct ~ SLV_pct)
-    fit = fit_ols_gld_on_slv(df_r)
-
-    # Print analysis results to terminal
-    print(f"Top-10% |SLV| threshold: {thr:.4f}")
-    print(
-        f"Slope: {fit['slope']:.6f}, Intercept: {fit['intercept']:.6f},\n"
-        f"R²: {fit['r2']:.6f}"
-    )
-    print(f"Big-move rows: {len(big)} / {len(df_r)}")
-
-    # Step 5: Save scatter plot with regression line to an image file
-    out_path = scatter_with_fit(df_r, fit, path="image.png")
-    print(f"Saved plot to {out_path}")
+df_gold = pd.read_csv("gold_data_2015_25.csv")
 
 
-if __name__ == "__main__":
-    # Run the analysis workflow if the script is called directly
-    main()
+def data_inspection(df_gold):
+    # sanity check: structure, stats, and missing values
+    print(df_gold.head())
+    df_gold.info()
+    print(df_gold.describe())
+    print("Missing values:\n", df_gold.isnull().sum())
+
+
+data_inspection(df_gold)
+
+# ensure proper time ordering for return calculations
+df_gold["Date"] = pd.to_datetime(df_gold["Date"])
+df_gold = df_gold.sort_values("Date").reset_index(drop=True)
+
+# stationarity: use % changes instead of raw prices
+df_gold["GLD_pct"] = df_gold["GLD"].pct_change()
+df_gold["SLV_pct"] = df_gold["SLV"].pct_change()
+
+# focus on extreme silver moves (top 10%) for stress testing
+slv_treshold = df_gold["SLV_pct"].abs().quantile(0.90)
+large_move_slv = df_gold["SLV_pct"].abs() >= slv_treshold
+subset = df_gold[large_move_slv]
+print("GLD% on those big SLV movement days:", subset["GLD_pct"].describe())
+
+# drop NaNs so regression isn’t biased
+returns_clean = df_gold.dropna(subset=["GLD_pct", "SLV_pct"])
+X = returns_clean[["SLV_pct"]].values  # predictor
+y = returns_clean["GLD_pct"].values  # response
+
+# linear model: measure GLD’s sensitivity to SLV moves
+model = LinearRegression().fit(X, y)
+
+print("\nPredicting GLD percent change using SLV percent change")
+print(
+    "slope:",
+    model.coef_[0],
+    " intercept:",
+    model.intercept_,
+    " R^2:",
+    model.score(X, y),
+)
+
+# visualize relation + fitted line to check model fit
+slv_predict_range = np.linspace(X.min(), X.max(), 200).reshape(-1, 1)
+plt.scatter(X, y, alpha=0.5, label="daily returns")
+plt.plot(
+    slv_predict_range, model.predict(slv_predict_range), linewidth=2, label="OLS fit"
+)
+
+# reference lines for easier interpretation
+plt.axhline(0, color="gray", linestyle="--")
+plt.axvline(0, color="gray", linestyle="--")
+
+plt.xlabel("SLV daily % change")
+plt.ylabel("GLD daily % change")
+plt.title("Linear relation: GLD% ~ SLV%")
+plt.legend()
+plt.tight_layout()
+plt.show()

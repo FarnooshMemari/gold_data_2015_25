@@ -1,3 +1,4 @@
+# -------------------------
 # Python cache
 __pycache__/
 *.py[cod]
@@ -5,6 +6,7 @@ __pycache__/
 # Virtual environments
 venv/
 .env/
+source/       
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
@@ -19,3 +21,15 @@ venv/
 *.png
 *.jpg
 *.jpeg
+
+# Logs and temp files
+*.log
+*.out
+*.tmp
+
+# Build / dist (for packaging)
+build/
+dist/
+*.egg-info/
+
+*.csv

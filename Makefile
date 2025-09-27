@@ -3,10 +3,11 @@ install:
 	pip install -r requirements.txt
 
 format:
-	black *.py
+	black .
 
 lint:
-	flake8 analysing_gold_data.py
+	lint:
+	flake8 --ignore=E501,W503 analysing_gold_data.py
 
 clean:
 	rm -rf __pycache__ .pytest_cache .coverage
