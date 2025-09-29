@@ -1,51 +1,17 @@
 import sys
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
+import matplotlib.dates as mdates
+import matplotlib.ticker as mtick
+import seaborn as sns
 
-# Helpful dependency check: if running with a Python that lacks packages,
-# print an actionable message instead of a raw ModuleNotFoundError traceback.
-missing = []
-try:
-    import numpy as np
-except Exception:
-    missing.append("numpy")
-try:
-    import pandas as pd
-except Exception:
-    missing.append("pandas")
-try:
-    import matplotlib.pyplot as plt
-except Exception:
-    missing.append("matplotlib")
-try:
-    from sklearn.linear_model import LinearRegression
-except Exception:
-    missing.append("scikit-learn")
-try:
-    import statsmodels.api as sm  # for p-values / inference
-except Exception:
-    # statsmodels is optional for basic runs; include it in requirements if you need p-values
-    missing.append("statsmodels")
+sns.set_style("whitegrid")
 
-if missing:
-    print("\n❌ Missing required Python packages: {}".format(", ".join(missing)))
-    print("Install dependencies with: pip install -r requirements.txt")
-    # If running inside the provided 'source' venv, give explicit hint
-    print(
-        "If you use the repository virtualenv: source/bin/pip install -r requirements.txt"
-    )
-    sys.exit(1)
-
-# Load dataset safely to avoid silent failures
-try:
-    gld_slv_df = pd.read_csv("gold_data_2015_25.csv")
-except FileNotFoundError:
-    print("❌ Error: The dataset 'gold_data_2015_25.csv' was not found.")
-    sys.exit(1)
-except pd.errors.EmptyDataError:
-    print("❌ Error: The dataset is empty.")
-    sys.exit(1)
-except Exception as e:
-    print(f"❌ Unexpected error while reading the dataset: {e}")
-    sys.exit(1)
+# --- Load dataset (regular read; will raise if missing) ---
+gld_slv_df = pd.read_csv("gold_data_2015_25.csv")
 
 
 # Inspect data early to catch schema/quality surprises
@@ -59,12 +25,8 @@ def data_inspection(df):
 data_inspection(gld_slv_df)
 
 # Ensure dates are ordered so returns reflect trading sequence
-try:
-    gld_slv_df["Date"] = pd.to_datetime(gld_slv_df["Date"])
-    gld_slv_df = gld_slv_df.sort_values("Date").reset_index(drop=True)
-except KeyError:
-    print("❌ Error: 'Date' column not found in dataset.")
-    sys.exit(1)
+gld_slv_df["Date"] = pd.to_datetime(gld_slv_df["Date"])
+gld_slv_df = gld_slv_df.sort_values("Date").reset_index(drop=True)
 
 # Use % changes instead of prices to remove trends/scale effects
 gld_slv_df["GLD_pct"] = gld_slv_df["GLD"].pct_change()
@@ -81,21 +43,6 @@ normal_df = gld_slv_df[~slv_big_move_mask]
 
 # ========= DESCRIPTIVES =========
 
-# Improve plot aesthetics and readability
-# Prefer seaborn style if available; fall back to a safe built-in style otherwise.
-try:
-    import seaborn as sns
-
-    # Use seaborn's API to set a whitegrid style (more robust than calling plt.style)
-    sns.set_style("whitegrid")
-except Exception:
-    try:
-        plt.style.use("seaborn-whitegrid")
-    except Exception:
-        # If seaborn or the style isn't available in this environment, fallback
-        # to a widely-available matplotlib style to avoid crashing.
-        plt.style.use("ggplot")
-
 # Boxplot: show GLD variability in normal vs big SLV days
 plt.figure(figsize=(7, 5))
 plt.boxplot(
@@ -109,8 +56,7 @@ plt.tight_layout()
 plt.show()
 
 # Time series: show shocks and co-movement patterns
-import matplotlib.dates as mdates
-import matplotlib.ticker as mtick
+
 
 plt.figure(figsize=(12, 5))
 plt.plot(gld_slv_df["Date"], gld_slv_df["GLD_pct"], label="GLD % change", linewidth=1)

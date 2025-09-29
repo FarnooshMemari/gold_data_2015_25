@@ -30,10 +30,15 @@ def scatter_with_fit(df, fit_info, path="scatter_fit.png"):
 
         sns.set_style("whitegrid")
     except Exception:
+        # If seaborn not available, only use a named style if it's present
         try:
-            plt.style.use("seaborn-whitegrid")
+            if "seaborn-whitegrid" in plt.style.available:
+                plt.style.use("seaborn-whitegrid")
+            else:
+                plt.style.use("ggplot")
         except Exception:
-            plt.style.use("ggplot")
+            # Fallback to matplotlib defaults if anything goes wrong
+            pass
 
     fig, ax = plt.subplots(figsize=(7, 5))
 

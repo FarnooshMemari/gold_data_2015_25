@@ -1,4 +1,4 @@
 [flake8]
 max-line-length = 100
-extend-ignore = E203, W503
-exclude = .venv, .git, __pycache__, .pytest_cache
+extend-ignore = E203, W503, E402, E501, E741, E731, E262
+exclude = .venv, venv, .git, __pycache__, .pytest_cache, build, dist, .venv/lib, venv/lib, site-packages
