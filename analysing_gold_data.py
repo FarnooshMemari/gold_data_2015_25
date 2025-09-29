@@ -1,4 +1,5 @@
 import sys
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,6 +8,10 @@ import statsmodels.api as sm
 import matplotlib.dates as mdates
 import matplotlib.ticker as mtick
 import seaborn as sns
+
+# Ensure figures directory exists and use it for saved plots
+FIG_DIR = os.path.join("reports", "figures")
+os.makedirs(FIG_DIR, exist_ok=True)
 
 sns.set_style("whitegrid")
 
@@ -53,11 +58,11 @@ plt.boxplot(
 plt.ylabel("GLD daily % change")
 plt.title("Distribution of GLD returns: Normal vs Big SLV Days")
 plt.tight_layout()
-plt.show()
+boxplot_path = os.path.join(FIG_DIR, "boxplot_gld_normal_vs_bigslv.png")
+plt.gcf().savefig(boxplot_path, dpi=200)
+plt.close()
 
 # Time series: show shocks and co-movement patterns
-
-
 plt.figure(figsize=(12, 5))
 plt.plot(gld_slv_df["Date"], gld_slv_df["GLD_pct"], label="GLD % change", linewidth=1)
 plt.plot(
@@ -90,7 +95,9 @@ ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
 plt.xticks(rotation=30, ha="right")
 plt.grid(alpha=0.25)
 plt.tight_layout()
-plt.show()
+timeseries_path = os.path.join(FIG_DIR, "timeseries_gld_slv_pct.png")
+plt.gcf().savefig(timeseries_path, dpi=200)
+plt.close()
 
 # ========= REGRESSION WITH P-VALUE =========
 
@@ -145,4 +152,6 @@ plt.ylabel("GLD daily % change")
 plt.title("Linear relation: GLD% ~ SLV% (with OLS line)")
 plt.legend()
 plt.tight_layout()
-plt.show()
+regression_path = os.path.join(FIG_DIR, "regression_gld_on_slv.png")
+plt.gcf().savefig(regression_path, dpi=200)
+plt.close()
