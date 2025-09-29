@@ -1,6 +1,5 @@
 # tests/test_viz.py
-# Purpose: sanity-check that the plotting helper saves a real PNG file.
-# We DO NOT verify pixels or charts visually—just that a valid image is produced.
+# Sanity-check: plotting helper saves a real PNG file (not pixel-perfect).
 
 import pandas as pd
 from gold_analysis.viz import scatter_with_fit
