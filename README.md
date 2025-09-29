@@ -1,3 +1,4 @@
+[![CodeQL Advanced](https://github.com/FarnooshMemari/gold_data_2015_25/actions/workflows/codeql.yml/badge.svg)](https://github.com/FarnooshMemari/gold_data_2015_25/actions/workflows/codeql.yml)
 # GLD vs SLV 📈
 
 **Do large daily moves in Silver (SLV) spill over into Gold (GLD)?**
